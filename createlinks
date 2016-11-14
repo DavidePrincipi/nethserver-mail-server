@@ -67,6 +67,7 @@ event_actions('nethserver-mail-server-update', qw(
 	      nethserver-mail-postmap-update 30
           nethserver-sssd-initkeytabs 50
           nethserver-mail-server-init-acl 98
+          nethserver-mail-bugfix5150 99
 ));
 
 event_services('nethserver-mail-server-update', qw(

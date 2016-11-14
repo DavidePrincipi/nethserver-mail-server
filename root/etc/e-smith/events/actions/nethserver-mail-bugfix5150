@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2016 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+shopt -s nullglob
+
+DOMAIN=$(hostname -d)
+
+
+pushd /var/lib/nethserver/vmail &>/dev/null
+
+for MDIR in *@${DOMAIN}; do
+   USER=${MDIR%%@${DOMAIN}}
+   HOME=$(basename $(eval echo ~${USER}))
+   if [[ "${HOME}" == ~* ]]; then
+        echo "[NOTICE] Ignoring mail dir $MDIR, unknown home dir for $USER. Please remove it manually."
+        continue
+   fi
+
+   if [[ -d "${HOME}" ]]; then
+        echo "[WARNING] The mail dir ${HOME} exists. Added .bak suffix to avoid overwriting it."
+        mv "${HOME}" "${HOME}".bak
+   fi
+
+   echo "[NOTICE] Migrating $MDIR to $HOME"
+   mv -v "${MDIR}" "${HOME}"
+
+done
+
+popd &>/dev/null
